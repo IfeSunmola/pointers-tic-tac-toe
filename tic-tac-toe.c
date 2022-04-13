@@ -30,11 +30,17 @@ void printWinner(char);
 int main() {
     char winner = ' ';
     char response = ' ';
-
+    int playerScore = 0;
+    int computerScore = 0;
+    int roundCount = 0;
     do {
         winner = ' ';
         response = ' ';
         resetBoard();
+        roundCount++;
+        system("cls");
+        printf("Round %d, the score is (PLAYER) %d - %d (COMPUTER)\n", roundCount, playerScore, computerScore);
+
 
         // while there's no winner and there are still spaces on the board
         while (winner == ' ' && checkFreeSpaces() != 0) {
@@ -53,16 +59,22 @@ int main() {
                 break;
             }
         }
-        getchar(); // clear the buffer so the "play again" response could be read properly"
+        getchar(); // clear the buffer so the "play again" response could be read properly
         printBoard();
         printWinner(winner);
-
+        if (winner == PLAYER) {
+            playerScore++;
+        }
+        else if (winner == COMPUTER) {
+            computerScore++;
+        }
         printf("\nWould you like to play again? (Y/N): ");
         scanf("%c", &response);
         response = toupper(response);
     } while (response == 'Y');
+    //print out some basic game stats
     printf("Thanks for playing!");
-
+    printf("\nRounds played: %d\nPlayer Score: %d\nComputer Score: %d", roundCount, playerScore, computerScore);
     return 0;
 }
 
