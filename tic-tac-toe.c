@@ -47,16 +47,14 @@ int main() {
                 break;
             }
         }
-
+        getchar(); // clear the buffer so the "play again" response could be read properly"
         printBoard();
         printWinner(winner);
 
         printf("\nWould you like to play again? (Y/N): ");
-        scanf("%c");
         scanf("%c", &response);
         response = toupper(response);
     } while (response == 'Y');
-
     printf("Thanks for playing!");
 
     return 0;
