@@ -23,51 +23,30 @@ A 2d array in memory is in "row major order". i.e Row 0 is on a straight block o
 
 
 #define BOARD_SIZE 3
-char board[3][3];
 const char PLAYER = 'X';
 const char COMPUTER = 'O';
 
 // prototypes
-void printBoard(char (* b)[3]) {
-    printf(" %c | %c | %c ", *(*b), *(*b + 1), *(*b + 2));
-    printf("\n---|---|---\n");
-    printf(" %c | %c | %c ", *(*b + 3), *(*b + 4), *(*b + 5));
-    printf("\n---|---|---\n");
-    printf(" %c | %c | %c ", *(*b + 6), *(*b + 7), *(*b + 8));
-    printf("\n");
-}
+void printBoard(char (* board)[BOARD_SIZE]);
 
-void resetBoard(char (* b)[3]) {
-    for (char* ptr = &b[0][0]; ptr <= &b[2][2]; ptr++) {
-        *ptr = ' ';
-    }
-}
+void resetBoard(char (* board)[BOARD_SIZE]);
 
-void resetBoard();
+int checkFreeSpaces(char (* board)[BOARD_SIZE]);
 
-void printBoard();
+void playerMove(char (* board)[BOARD_SIZE]);
 
-int checkFreeSpaces();
+void computerMove(char (* board)[BOARD_SIZE]);
 
-void playerMove();
+char checkWinner(char (* board)[BOARD_SIZE]);
 
-void computerMove();
+void printWinner(char winner);
 
-char checkWinner();
-
-void printWinner(char);
 
 int main() {
-//    char b[3][3] = {
-//            {' ', ' ', ' '},
-//            {' ', ' ', ' '},
-//            {' ', ' ', ' '},
-//    };
-
     char b[BOARD_SIZE][BOARD_SIZE] = {
-            {'A', 'B', 'C'},
-            {'D', 'E', 'F'},
-            {'G', 'H', 'I'},
+            {' ', ' ', ' '},
+            {' ', ' ', ' '},
+            {' ', ' ', ' '},
     };
     char winner = ' ';
     char response = ' ';
@@ -85,19 +64,19 @@ int main() {
 
 
         // while there's no winner and there are still spaces on the board
-        while (winner == ' ' && checkFreeSpaces() != 0) {
+        while (winner == ' ' && checkFreeSpaces(b) != 0) {
             printBoard(b);
-            playerMove();
-            winner = checkWinner(); // check if the player has won
+            playerMove(b);
+            winner = checkWinner(b); // check if the player has won
             // if there is a winner OR there's no space left on the board,
             // break out of the current loop and print the result
-            if (winner != ' ' || checkFreeSpaces() == 0) {
+            if (winner != ' ' || checkFreeSpaces(b) == 0) {
                 break;
             }
 
-            computerMove();
-            winner = checkWinner();
-            if (winner != ' ' || checkFreeSpaces() == 0) {
+            computerMove(b);
+            winner = checkWinner(b);
+            if (winner != ' ' || checkFreeSpaces(b) == 0) {
                 break;
             }
         }
@@ -120,51 +99,38 @@ int main() {
     return 0;
 }
 
-//void resetBoard(char* b) {
-//    for (int i = 0; i < 3; i++) {
-//        for (int j = 0; j < 3; j++) {
-//            board[i][j] = ' ';
-//        }
-//    }
-//}
+/*
+ * This function prints the tic-tac-toe board.
+ * This function shows the player the board after every move is made
+ * */
+void printBoard(char (* board)[BOARD_SIZE]) {
+    printf(" %c | %c | %c ", *(*board), *(*board + 1), *(*board + 2));
+    printf("\n---|---|---\n");
+    printf(" %c | %c | %c ", *(*board + 3), *(*board + 4), *(*board + 5));
+    printf("\n---|---|---\n");
+    printf(" %c | %c | %c ", *(*board + 6), *(*board + 7), *(*board + 8));
+    printf("\n");
+}
 
 /*
  * This function resets each value of the board (2d array) to an empty character
  * It is called before a new round begins
  * */
-//void resetBoard() {
-//    for (int i = 0; i < 3; i++) {
-//        for (int j = 0; j < 3; j++) {
-//            board[i][j] = ' ';
-//        }
-//    }
-//}
-
-/*
- * This function prints the tic-tac-toe board.
- * This function shows the player the board after every move is made
- * */
-//void printBoard() {
-//    printf(" %c | %c | %c ", board[0][0], board[0][1], board[0][2]);
-//    printf("\n---|---|---\n");
-//    printf(" %c | %c | %c ", board[1][0], board[1][1], board[1][2]);
-//    printf("\n---|---|---\n");
-//    printf(" %c | %c | %c ", board[2][0], board[2][1], board[2][2]);
-//    printf("\n");
-//}
+void resetBoard(char (* board)[BOARD_SIZE]) {
+    for (char* ptr = &board[0][0]; ptr <= &board[BOARD_SIZE - 1][BOARD_SIZE - 1]; ptr++) {
+        *ptr = ' ';
+    }
+}
 
 /*
  * This function returns the amount of empty spaces left on the board
  * If the amount of empty spaces is <= 0, that means the game will end in a tie
  * */
-int checkFreeSpaces() {
+int checkFreeSpaces(char (* board)[BOARD_SIZE]) {
     int freeSpaces = 9;
-    // loop through the board and decrement freeSpaces anytime a board content is ' '
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            if (board[i][j] != ' ') {
-                freeSpaces--;
-            }
+    for (char* ptr = &board[0][0]; ptr <= &board[BOARD_SIZE - 1][BOARD_SIZE - 1]; ptr++) {
+        if (*ptr != ' ') {
+            freeSpaces--;
         }
     }
     return freeSpaces;
@@ -175,15 +141,15 @@ int checkFreeSpaces() {
  * This function also makes sure the player selects a valid move. If not, it will keep asking till the user makes
  * a valid selection
  * */
-void playerMove() {
+void playerMove(char (* board)[BOARD_SIZE]) {
     int rowNum;
     int colNum;
 
     do {
-        printf("Enter row #(1-3): ");
+        printf("Enter row # (1-3): ");
         scanf("%d", &rowNum);
         rowNum--; // decrementing because of 0 index
-        printf("Enter column #(1-3): ");
+        printf("Enter column # (1-3): ");
         scanf("%d", &colNum);
         colNum--;
         if (board[rowNum][colNum] != ' ') {// spot has been played on
@@ -201,13 +167,13 @@ void playerMove() {
  * This function makes a move for the computer by using random numbers
  *
  * */
-void computerMove() {
+void computerMove(char (* board)[BOARD_SIZE]) {
     //creates a seed based on current time
     srand(time(0));
     int rowNum;
     int colNum;
 
-    if (checkFreeSpaces() > 0) { // if there's still space on the board
+    if (checkFreeSpaces(board) > 0) { // if there's still space on the board
         do { // keep generating a random number between [1, 3] till an empty spot is found
             rowNum = rand() % 3;
             colNum = rand() % 3;
@@ -218,34 +184,6 @@ void computerMove() {
     else { // no more space on the board, it's a tie
         printWinner(' ');
     }
-}
-
-/*
- * This function checks for a winner by checking each row, column and the diagonals
- * It returns the char of the WINNER
- * */
-char checkWinner() {
-    //check rows
-    for (int i = 0; i < 3; i++) {
-        if (board[i][0] == board[i][1] && board[i][0] == board[i][2]) {
-            return board[i][0];
-        }
-    }
-    //check columns
-    for (int i = 0; i < 3; i++) {
-        if (board[0][i] == board[1][i] && board[0][i] == board[2][i]) {
-            return board[0][i];
-        }
-    }
-    //check diagonals
-    if (board[0][0] == board[1][1] && board[0][0] == board[2][2]) {
-        return board[0][0];
-    }
-    if (board[0][2] == board[1][1] && board[0][2] == board[2][0]) {
-        return board[0][2];
-    }
-
-    return ' ';
 }
 
 /*
@@ -263,3 +201,33 @@ void printWinner(char winner) {
         printf("IT'S A TIE!");
     }
 }
+
+/*
+ * This function checks for a winner by checking each row, column and the diagonals
+ * It returns the char of the WINNER
+ * */
+char checkWinner(char (* board)[BOARD_SIZE]) {
+    //check rows
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        if (board[i][0] == board[i][1] && board[i][0] == board[i][2]) {
+            return board[i][0];
+        }
+    }
+    //check columns
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        if (board[0][i] == board[1][i] && board[0][i] == board[2][i]) {
+            return board[0][i];
+        }
+    }
+    //check diagonals
+    if (board[0][0] == board[1][1] && board[0][0] == board[2][2]) {
+        return board[0][0];
+    }
+    if (board[0][2] == board[1][1] && board[0][2] == board[2][0]) {
+        return board[0][2];
+    }
+
+    return ' ';
+}
+
+
