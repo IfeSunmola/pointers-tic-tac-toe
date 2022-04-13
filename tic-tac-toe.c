@@ -1,5 +1,8 @@
-//This is a tic tac toe game written in C designed for beginners
-//(This doesn't contain the use of pointers or other more advanced C topics)
+/*
+ * Author: Bro Code -> https://youtu.be/_889aB2D1KI?list=PLZPZq0r_RZOOzY_vR4zJM32SqsSInGMwe
+ *
+ * Modified by: Ife Sunmola
+ * */
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -9,6 +12,7 @@ char board[3][3];
 const char PLAYER = 'X';
 const char COMPUTER = 'O';
 
+// prototypes
 void resetBoard();
 
 void printBoard();
@@ -32,11 +36,13 @@ int main() {
         response = ' ';
         resetBoard();
 
+        // while there's no winner and there are still spaces on the board
         while (winner == ' ' && checkFreeSpaces() != 0) {
             printBoard();
-
             playerMove();
-            winner = checkWinner();
+            winner = checkWinner(); // check if the player has won
+            // if there is a winner OR there's no space left on the board,
+            // break out of the current loop and print the result
             if (winner != ' ' || checkFreeSpaces() == 0) {
                 break;
             }
@@ -60,6 +66,10 @@ int main() {
     return 0;
 }
 
+/*
+ * This function resets each value of the board (2d array) to an empty character
+ * It is called before a new round begins
+ * */
 void resetBoard() {
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
@@ -68,6 +78,10 @@ void resetBoard() {
     }
 }
 
+/*
+ * This function prints the tic-tac-toe board.
+ * This function shows the player the board after every move is made
+ * */
 void printBoard() {
     printf(" %c | %c | %c ", board[0][0], board[0][1], board[0][2]);
     printf("\n---|---|---\n");
@@ -77,9 +91,13 @@ void printBoard() {
     printf("\n");
 }
 
+/*
+ * This function returns the amount of empty spaces left on the board
+ * If the amount of empty spaces is <= 0, that means the game will end in a tie
+ * */
 int checkFreeSpaces() {
     int freeSpaces = 9;
-
+    // loop through the board and decrement freeSpaces anytime a board content is ' '
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             if (board[i][j] != ' ') {
@@ -90,49 +108,60 @@ int checkFreeSpaces() {
     return freeSpaces;
 }
 
+/*
+ * This function enables the player to make a move by asking for the row and column they want to move to
+ * This function also makes sure the player selects a valid move. If not, it will keep asking till the user makes
+ * a valid selection
+ * */
 void playerMove() {
-    int x;
-    int y;
+    int rowNum;
+    int colNum;
 
     do {
         printf("Enter row #(1-3): ");
-        scanf("%d", &x);
-
-        x--;
+        scanf("%d", &rowNum);
+        rowNum--; // decrementing because of 0 index
         printf("Enter column #(1-3): ");
-        scanf("%d", &y);
-
-        y--;
-        if (board[x][y] != ' ') {
+        scanf("%d", &colNum);
+        colNum--;
+        if (board[rowNum][colNum] != ' ') {// spot has been played on
             printf("Invalid move!\n");
         }
         else {
-            board[x][y] = PLAYER;
+            board[rowNum][colNum] = PLAYER;// mark the spot has taken by player
             break;
         }
-    } while (board[x][y] != ' ');
+    } while (board[rowNum][colNum] != ' ');
 
 }
 
+/*
+ * This function makes a move for the computer by using random numbers
+ *
+ * */
 void computerMove() {
     //creates a seed based on current time
     srand(time(0));
-    int x;
-    int y;
+    int rowNum;
+    int colNum;
 
-    if (checkFreeSpaces() > 0) {
-        do {
-            x = rand() % 3;
-            y = rand() % 3;
-        } while (board[x][y] != ' ');
+    if (checkFreeSpaces() > 0) { // if there's still space on the board
+        do { // keep generating a random number between [1, 3] till an empty spot is found
+            rowNum = rand() % 3;
+            colNum = rand() % 3;
+        } while (board[rowNum][colNum] != ' ');
 
-        board[x][y] = COMPUTER;
+        board[rowNum][colNum] = COMPUTER;// mark the spot
     }
-    else {
+    else { // no more space on the board, it's a tie
         printWinner(' ');
     }
 }
 
+/*
+ * This function checks for a winner by checking each row, column and the diagonals
+ * It returns the char of the WINNER
+ * */
 char checkWinner() {
     //check rows
     for (int i = 0; i < 3; i++) {
@@ -157,6 +186,10 @@ char checkWinner() {
     return ' ';
 }
 
+/*
+ * This method prints the winner, based of the argument passed
+ * If an empty char is passed, or a char that isn't PLAYER or Computer, it's a tie
+ * */
 void printWinner(char winner) {
     if (winner == PLAYER) {
         printf("YOU WIN!");
