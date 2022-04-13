@@ -3,16 +3,46 @@
  *
  * Modified by: Ife Sunmola
  * */
+
+/*
+REMEMBER: An array is closely related to a pointer.
+A 2d array in memory is in "row major order". i.e Row 0 is on a straight block of memory, followed by
+ row 1, row 2, etc. With this knowledge, we can use the pointers to access all the elements in the array by
+ just moving the pointer to the next memory address and dereference it to get the data stored there
+ the entire matrix can be traversed using one for loop and the memory address
+
+ *board returns a pointer to the first data in the 2d array
+ *(*board) dereferences the that pointer to get the data
+ *(*board + 1) moves the pointer to the next location and gets the value
+ this is how the 2d array will be traversed
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <time.h>
 
+
+#define BOARD_SIZE 3
 char board[3][3];
 const char PLAYER = 'X';
 const char COMPUTER = 'O';
 
 // prototypes
+void printBoard(char (* b)[3]) {
+    printf(" %c | %c | %c ", *(*b), *(*b + 1), *(*b + 2));
+    printf("\n---|---|---\n");
+    printf(" %c | %c | %c ", *(*b + 3), *(*b + 4), *(*b + 5));
+    printf("\n---|---|---\n");
+    printf(" %c | %c | %c ", *(*b + 6), *(*b + 7), *(*b + 8));
+    printf("\n");
+}
+
+void resetBoard(char (* b)[3]) {
+    for (char* ptr = &b[0][0]; ptr <= &b[2][2]; ptr++) {
+        *ptr = ' ';
+    }
+}
+
 void resetBoard();
 
 void printBoard();
@@ -28,15 +58,27 @@ char checkWinner();
 void printWinner(char);
 
 int main() {
+//    char b[3][3] = {
+//            {' ', ' ', ' '},
+//            {' ', ' ', ' '},
+//            {' ', ' ', ' '},
+//    };
+
+    char b[BOARD_SIZE][BOARD_SIZE] = {
+            {'A', 'B', 'C'},
+            {'D', 'E', 'F'},
+            {'G', 'H', 'I'},
+    };
     char winner = ' ';
     char response = ' ';
     int playerScore = 0;
     int computerScore = 0;
     int roundCount = 0;
+
     do {
         winner = ' ';
         response = ' ';
-        resetBoard();
+        resetBoard(b);
         roundCount++;
         system("cls");
         printf("Round %d, the score is (PLAYER) %d - %d (COMPUTER)\n", roundCount, playerScore, computerScore);
@@ -44,7 +86,7 @@ int main() {
 
         // while there's no winner and there are still spaces on the board
         while (winner == ' ' && checkFreeSpaces() != 0) {
-            printBoard();
+            printBoard(b);
             playerMove();
             winner = checkWinner(); // check if the player has won
             // if there is a winner OR there's no space left on the board,
@@ -60,7 +102,7 @@ int main() {
             }
         }
         getchar(); // clear the buffer so the "play again" response could be read properly
-        printBoard();
+        printBoard(b);
         printWinner(winner);
         if (winner == PLAYER) {
             playerScore++;
@@ -78,30 +120,38 @@ int main() {
     return 0;
 }
 
+//void resetBoard(char* b) {
+//    for (int i = 0; i < 3; i++) {
+//        for (int j = 0; j < 3; j++) {
+//            board[i][j] = ' ';
+//        }
+//    }
+//}
+
 /*
  * This function resets each value of the board (2d array) to an empty character
  * It is called before a new round begins
  * */
-void resetBoard() {
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            board[i][j] = ' ';
-        }
-    }
-}
+//void resetBoard() {
+//    for (int i = 0; i < 3; i++) {
+//        for (int j = 0; j < 3; j++) {
+//            board[i][j] = ' ';
+//        }
+//    }
+//}
 
 /*
  * This function prints the tic-tac-toe board.
  * This function shows the player the board after every move is made
  * */
-void printBoard() {
-    printf(" %c | %c | %c ", board[0][0], board[0][1], board[0][2]);
-    printf("\n---|---|---\n");
-    printf(" %c | %c | %c ", board[1][0], board[1][1], board[1][2]);
-    printf("\n---|---|---\n");
-    printf(" %c | %c | %c ", board[2][0], board[2][1], board[2][2]);
-    printf("\n");
-}
+//void printBoard() {
+//    printf(" %c | %c | %c ", board[0][0], board[0][1], board[0][2]);
+//    printf("\n---|---|---\n");
+//    printf(" %c | %c | %c ", board[1][0], board[1][1], board[1][2]);
+//    printf("\n---|---|---\n");
+//    printf(" %c | %c | %c ", board[2][0], board[2][1], board[2][2]);
+//    printf("\n");
+//}
 
 /*
  * This function returns the amount of empty spaces left on the board
