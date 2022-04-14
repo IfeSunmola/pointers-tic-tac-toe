@@ -44,20 +44,17 @@ int main() {
     const char PLAYER = 'X';
     const char COMPUTER = 'O';
     char winner;
-    char response;
-    int playerScore = 0;
-    int computerScore = 0;
-    int roundCount = 0;
+    char response = 'Y';// start the game. Not assigning this could break the game
+    int playerScore = 0, computerScore = 0, roundCount = 0;
 
     char board[BOARD_SIZE][BOARD_SIZE];
     resetBoard(board);
-
-    do {
+    while (response != 'N') {
         winner = ' ';
         response = ' ';
         resetBoard(board);
         roundCount++;
-        system("cls");
+        system("cls"); // clear the screen before each round begins
         printf("Round %d, the score is (PLAYER) %d - %d (COMPUTER)\n", roundCount, playerScore, computerScore);
 
 
@@ -90,7 +87,7 @@ int main() {
         printf("\nWould you like to play again? (Y/N): ");
         scanf("%c", &response);
         response = toupper(response);
-    } while (response == 'Y');
+    }
     //print out some basic game stats
     printf("Thanks for playing!");
     printf("\nRounds played: %d\nPlayer Score: %d\nComputer Score: %d", roundCount, playerScore, computerScore);
@@ -118,11 +115,11 @@ void printBoard(char (* board)[BOARD_SIZE]) {
  * parameters: char board [][]
  * */
 void resetBoard(char (* board)[BOARD_SIZE]) {
-    /*
-     *
-     * */
-    printf("\n%p\n%p\n%p\n%p\n", board, &board[0], &board, &board[0][0]);
     // using board OR &board[0] works but gives a warning ??
+
+    // start the loop at the pointer to the first item in the 2d matrix, and keep changing
+    // the memory address till it gets to the last address.
+    // remember: in memory, a 2d array is stored in row major order
     for (char* ptr = &board[0][0]; ptr <= &board[BOARD_SIZE - 1][BOARD_SIZE - 1]; ptr++) {
         *ptr = ' ';
     }
