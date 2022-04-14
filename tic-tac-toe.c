@@ -105,17 +105,22 @@ int main() {
 }
 
 /*
+ * *Changed to use a loop pointer instead of printing directly*
  * This function prints the tic-tac-toe board.
  * parameters: char board [][]
  * */
 void printBoard(char (* board)[BOARD_SIZE]) {
-    // TODO: change this to use a loop
-    // check comments are the beginning of the file
-    printf(" %c | %c | %c ", *(*board), *(*board + 1), *(*board + 2));
-    printf("\n---|---|---\n");
-    printf(" %c | %c | %c ", *(*board + 3), *(*board + 4), *(*board + 5));
-    printf("\n---|---|---\n");
-    printf(" %c | %c | %c ", *(*board + 6), *(*board + 7), *(*board + 8));
+    int tracker = 1; // used to know when to go to a new line
+    // keep looping till the end of the memory block allocated for the array
+    for (char* ptr = &board[0][0]; ptr <= &board[BOARD_SIZE - 1][BOARD_SIZE - 1]; ptr++, tracker++) {
+        printf(" %c ", *ptr);
+        if (tracker % BOARD_SIZE == 0 && tracker <= 6) {// if at the edge of a new row:
+            printf("\n---|---|---\n"); // tracker <= 6 will prevent this from printing again at the last row
+        }
+        else if (tracker != BOARD_SIZE * BOARD_SIZE) { // not the last char in the list, add a border
+            printf("|");
+        }
+    }
     printf("\n");
 }
 
