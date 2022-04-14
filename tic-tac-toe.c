@@ -20,6 +20,7 @@ The entire matrix can be traversed using one for loop and the memory address
 #include <stdlib.h>
 #include <ctype.h>
 #include <time.h>
+#include <stdbool.h>
 
 
 #define BOARD_SIZE 3
@@ -39,6 +40,15 @@ char checkWinner(char (* board)[BOARD_SIZE]);
 
 void printWinner(char winner, const char* PLAYER, const char* COMPUTER);
 
+/*
+ * This method returns true if there is a winner of if the board is full and false if not
+ *
+ * parameters: char board [][]
+ *             pointer to the winner char
+ * */
+bool winnerOrTie(char (* board)[BOARD_SIZE], char* winner) {
+    return (*winner != ' ' || checkFreeSpaces(board) == 0);
+}
 
 int main() {
     const char PLAYER = 'X';
@@ -58,20 +68,20 @@ int main() {
         printf("Round %d, the score is (PLAYER) %d - %d (COMPUTER)\n", roundCount, playerScore, computerScore);
 
 
-        // while there's no winner and there are still spaces on the board
+        // while there's no winner and there are still spaces on the board, keep playing
         while (winner == ' ' && checkFreeSpaces(board) != 0) {
             printBoard(board);
             playerMove(board, &PLAYER);
             winner = checkWinner(board); // check if the player has won
             // if there is a winner OR there's no space left on the board,
             // break out of the current loop and print the result
-            if (winner != ' ' || checkFreeSpaces(board) == 0) {
+            if (winnerOrTie(board, &winner)) {// if there is a winner or there's a tie (board is full)
                 break;
             }
 
             computerMove(board, &COMPUTER);
             winner = checkWinner(board);
-            if (winner != ' ' || checkFreeSpaces(board) == 0) {
+            if (winnerOrTie(board, &winner)) {
                 break;
             }
         }
