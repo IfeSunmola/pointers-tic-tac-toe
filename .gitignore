@@ -2,3 +2,5 @@ CMakeLists.txt
 cmake-build-debug
 a.exe
 .idea
+tests.c
+img.png
