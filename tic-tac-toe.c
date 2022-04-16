@@ -11,9 +11,6 @@ row 1, row 2, etc. With this knowledge, we can use the pointers to access all th
 just moving the pointer to the next memory address and dereference it to get the data stored there.
 The entire matrix can be traversed using one for loop and the memory address
 
- *board returns a pointer to the first data in the 2d array
- *(*board) dereferences that pointer to get the data
- *(*board + 1) moves the pointer to the next location and gets the value
  this is how the 2d array will be traversed
 */
 #include <stdio.h>
@@ -36,11 +33,9 @@ void playerMove(char* board, const char* PLAYER);
 
 void computerMove(char* board, const char* computer);
 
-char checkWinner(char* board);
+void checkWinner(char* board, char* winner);
 
 void printWinner(char winner, const char* PLAYER, const char* COMPUTER);
-
-bool winnerOrTie(char* board, char* winner);
 
 void requestPlayAgain(char* playAgain);
 
@@ -49,15 +44,15 @@ int main() {
     const char COMPUTER = 'O';
     char winner;
     char playAgain = 'Y';// start the game. Not assigning this could break the game
-    int playerScore = 0, computerScore = 0, roundCount = 0;
+    int playerScore = 0, computerScore = 0, numTies = 0, roundCount = 0;
 
-    char* board = (char*) malloc(NUM_ELEMENTS * sizeof(char));
-    resetBoard(board);
+    char* board = (char*) malloc(NUM_ELEMENTS * sizeof(char));// reserve memory for 9 chars
+    resetBoard(board);// set them to ' '
     while (playAgain != 'N') {
         winner = ' ';
         resetBoard(board);
-        roundCount++;
         system("cls"); // clear the screen before each round begins
+        roundCount++;
         printf("Round %d, the score is (PLAYER) %d - %d (COMPUTER)\n", roundCount, playerScore, computerScore);
 
 
@@ -66,16 +61,16 @@ int main() {
             printBoard(board);
 
             playerMove(board, &PLAYER); //player makes a move
-            winner = checkWinner(board); // check if the player has won
+            checkWinner(board, &winner); // check if the player has won. winner will be updated using its memory address
             // if the PLAYER has not won OR there's no space left on the board, break out of the current loop and print the result
-            if (winnerOrTie(board, &winner)) {// if there is a winner or there's a tie (board is full)
+            if (winner != ' ' || checkFreeSpaces(board) == 0) {// if there is a winner or there's a tie (board is full)
                 break;
             }
 
             computerMove(board, &COMPUTER);// computer makes a move
-            winner = checkWinner(board);// check if the computer has won
+            checkWinner(board, &winner);//check if the computer has won. winner will be updated using its memory address
             // if the COMPUTER has not won OR there's no space left on the board, break out of the current loop and print the result
-            if (winnerOrTie(board, &winner)) {
+            if (winner != ' ' || checkFreeSpaces(board) == 0) {
                 break;
             }
         }
@@ -83,12 +78,15 @@ int main() {
         printBoard(board); // show the final board state
         printWinner(winner, &PLAYER, &COMPUTER);// winner, loser or tie
 
-        // update the scores
+        // update the stats
         if (winner == PLAYER) {
             playerScore++;
         }
         else if (winner == COMPUTER) {
             computerScore++;
+        }
+        else {
+            numTies++;
         }
 
         //ask the user if they want to play another round
@@ -97,14 +95,14 @@ int main() {
     free(board);
     //print out some basic game stats
     printf("Thanks for playing!");
-    printf("\nRounds played: %d\nPlayer Score: %d\nComputer Score: %d", roundCount, playerScore, computerScore);
+    printf("\nRounds played: %d\nPlayer Score: %d\nComputer Score: %d\nNumber of ties: %d", roundCount, playerScore,
+           computerScore, numTies);
     return 0;
 }
 
 /*
- * *Changed to use a loop pointer instead of printing directly*
- * This function prints the tic-tac-toe board.
- * parameters: char board [][]
+ * Prints the board in a standard tic-tac-toe form
+ * parameters: char* board: a pointer to the board array
  * */
 void printBoard(char* board) {
     int rowSize = NUM_ELEMENTS / 3; // num of elements in one row
@@ -125,7 +123,7 @@ void printBoard(char* board) {
 /*
  * This function resets each value of the board (2d array) to an empty character
  * It is called before a new round begins
- * parameters: char board [][]
+ * parameters: char* board
  * */
 void resetBoard(char* board) {
     for (char* ptr = board; ptr <= &board[NUM_ELEMENTS]; ptr++) {
@@ -137,7 +135,7 @@ void resetBoard(char* board) {
  * This function returns the amount of empty spaces left on the board
  * If the amount of empty spaces is <= 0, that means the game will end in a tie
  *
- * parameters char [][] board
+ * parameters: char* board
  * */
 int checkFreeSpaces(char* board) {
     int freeSpaces = 9;
@@ -154,8 +152,8 @@ int checkFreeSpaces(char* board) {
  * This function also makes sure the PLAYER selects a valid move. If not, it will keep asking till the user makes
  * a valid selection
  *
- * parameters: char board [][]
-               A pointer to the player char
+ * parameters: char* board
+               const char* PLAYER: A pointer to the player character
  * */
 void playerMove(char* board, const char* PLAYER) {
     int rowNum;
@@ -167,9 +165,11 @@ void playerMove(char* board, const char* PLAYER) {
         printf("Enter row # (1-3): ");
         scanf("%d", &rowNum);
         rowNum--; // decrementing because of 0 index
+
         printf("Enter column # (1-3): ");
         scanf("%d", &colNum);
         colNum--;
+
         actualIndex = (rowNum * rowSize) + colNum;
         if (board[actualIndex] != ' ') {// spot has been played on
             printf("Invalid move!\n");
@@ -185,21 +185,21 @@ void playerMove(char* board, const char* PLAYER) {
 /*
  * This function makes a move for the computer by using random numbers
  *
- * parameters: char[][] board
- *             A pointer to the COMPUTER char
+ * parameters: char* board
+ *             const char * COMPUTER A pointer to the COMPUTER character
  *
  * */
 void computerMove(char* board, const char* COMPUTER) {
     //creates a seed based on current time
     srand(time(0));
-    int num;
+    int index;// where the computer will play to
 
     if (checkFreeSpaces(board) > 0) { // if there's still space on the board
         do { // keep generating a random number between [1, 9] till an empty spot is found
-            num = rand() % NUM_ELEMENTS;
-        } while (board[num] != ' ');
+            index = rand() % NUM_ELEMENTS;
+        } while (board[index] != ' ');
 
-        board[num] = *COMPUTER;// mark the spot
+        board[index] = *COMPUTER;// mark the spot
     }
     else { // no more space on the board, it's a tie
         printWinner(' ', NULL, NULL);
@@ -211,8 +211,8 @@ void computerMove(char* board, const char* COMPUTER) {
  * If an empty char is passed, or a char that isn't PLAYER or Computer, it's a tie
  *
  * parameters: char winner: the winner of the current round, either PLAYER or COMPUTER
- *             char* PLAYER: pointer to the PLAYER char
- *             char* COMPUTER: pointer to the COMPUTER char
+ *             const char* PLAYER: pointer to the PLAYER character
+ *             const char* COMPUTER: pointer to the COMPUTER character
  * */
 void printWinner(char winner, const char* PLAYER, const char* COMPUTER) {
     if (winner == *PLAYER) {
@@ -228,79 +228,62 @@ void printWinner(char winner, const char* PLAYER, const char* COMPUTER) {
 
 /*
  * This function checks for a winner by checking each row, column and the diagonals
- * It returns the char of the WINNER
+ * THIS FUNCTION UPDATES THE winner VARIABLE DECLARED IN MAIN
  *
- * parameters: the board array
- * returns: a char containing the winner of this round or an empty char if there's no winner yet
+ * parameters: char* board
  * */
-char checkWinner(char* board) {
+void checkWinner(char* board, char* winner) {
     //todo: change this to be literally anything else
-    //checking rows: Winner will have their char on 3 consecutive spaces
     //rows
-    if (board[0] == board[1] == board[2]) {
-        return board[0];
+    if (board[0] == board[1] && board[1] == board[2]) {
+        *winner = board[0];
     }
-    if (board[3] == board[4] == board[5]) {
-        return board[3];
+    if (board[3] == board[4] && board[4] == board[5]) {
+        *winner = board[3];
     }
-    if (board[6] == board[7] == board[8]) {
-        return board[6];
+    if (board[6] == board[7] && board[7] == board[8]) {
+        *winner = board[6];
     }
-    //cols
-    if (board[0] == board[3] == board[6]) {
-        return board[0];
-    }
-    if (board[1] == board[4] == board[7]) {
-        return board[1];
-    }
-    if (board[2] == board[5] == board[8]) {
-        return board[2];
-    }
-    //cols
 
-//    //check rows
-//    for (int i = 0; i < BOARD_SIZE; i++) {
-//        if (board[i][0] == board[i][1] && board[i][0] == board[i][2]) {
-//            return board[i][0];
-//        }
-//    }
-//    //check columns
-//    for (int i = 0; i < BOARD_SIZE; i++) {
-//        if (board[0][i] == board[1][i] && board[0][i] == board[2][i]) {
-//            return board[0][i];
-//        }
-//    }
-//    //check diagonals
-//    if (board[0][0] == board[1][1] && board[0][0] == board[2][2]) {
-//        return board[0][0];
-//    }
-//    if (board[0][2] == board[1][1] && board[0][2] == board[2][0]) {
-//        return board[0][2];
-//    }
-    return ' ';
+    //cols
+    if (board[0] == board[3] && board[3] == board[6]) {
+        *winner = board[0];
+    }
+    if (board[1] == board[4] && board[4] == board[7]) {
+        *winner = board[1];
+    }
+    if (board[2] == board[5] && board[5] == board[8]) {
+        *winner = board[2];
+    }
+
+    //diagonals
+    if (board[0] == board[4] && board[4] == board[8]) {
+        *winner = board[0];
+    }
+    if (board[2] == board[4] && board[4] == board[6]) {
+        *winner = board[2];
+    }
 }
 
 /*
- * This method returns true if there is a winner of if the board is full and false if not
+ * This function asks the user if they would like to play another round
+ * Valid inputs are y, Y, N AND n
+ * The function will keep asking the user to enter something valid
  *
- * parameters: char board [][]
- *             pointer to the winner char
+ * THIS FUNCTION UPDATES THE playAgain VARIABLE THAT WAS DECLARED IN MAIN
+ *
  * */
-bool winnerOrTie(char* board, char* winner) {
-    return (*winner != ' ' || checkFreeSpaces(board) == 0);
-}
-
 void requestPlayAgain(char* playAgain) {
-    bool validInput = false;
+    bool validInput = false;// will change in the loop when something valid is entered
     while (!validInput) {
         printf("\nWould you like to play again? (Y/N): ");
         scanf(" %c", playAgain);
-        fflush(stdin);
-        *playAgain = toupper(*playAgain);
-        if (*playAgain == 'Y' || *playAgain == 'N') {
+        fflush(stdin);// clear the stdin so there are no dangling characters
+        *playAgain = toupper(*playAgain);// convert to upper case
+        if (*playAgain == 'Y' || *playAgain == 'N') { // valid input was entered, exit the loop
             validInput = true;
         }
-        else {
+        else {// invalid input, show error message and repeat
             printf("Enter either Y or N (not case sensitive)");
         }
     }
