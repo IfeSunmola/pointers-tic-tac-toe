@@ -6,7 +6,7 @@
 
 /*
 An array is closely related to a pointer.
-A 2d array in memory is in "row major order". i.e Row 0 is on a straight block of memory, followed by
+A 2d array in memory is in "row major order". i.e. Row 0 is on a straight block of memory, followed by
 row 1, row 2, etc. With this knowledge, we can use the pointers to access all the elements in the array by
 just moving the pointer to the next memory address and dereference it to get the data stored there.
 The entire matrix can be traversed using one for loop and the memory address
@@ -18,7 +18,6 @@ The entire matrix can be traversed using one for loop and the memory address
 #include <ctype.h>
 #include <time.h>
 #include <stdbool.h>
-
 
 #define NUM_ELEMENTS 9
 
@@ -159,7 +158,7 @@ void playerMove(char* board, const char* PLAYER) {
     int rowNum;
     int colNum;
     int rowSize = NUM_ELEMENTS / 3;
-    int actualIndex = 0;// actual index to mark the PLAYER on. If a user enters row, num as (2, 3), actual index will
+    int actualIndex;// actual index to mark the PLAYER on. If a user enters row, num as (2, 3), actual index will
     // be gotten by (2 * rowSize) + 3
     do {
         printf("Enter row # (1-3): ");
