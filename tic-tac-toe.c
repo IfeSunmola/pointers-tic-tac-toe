@@ -5,7 +5,7 @@
  * */
 
 /*
-REMEMBER: An array is closely related to a pointer.
+An array is closely related to a pointer.
 A 2d array in memory is in "row major order". i.e Row 0 is on a straight block of memory, followed by
 row 1, row 2, etc. With this knowledge, we can use the pointers to access all the elements in the array by
 just moving the pointer to the next memory address and dereference it to get the data stored there.
@@ -71,9 +71,11 @@ int main() {
                 break;
             }
         }
-        fflush(stdin); // flush the buffer so the playAgain response could be read properly
-        printBoard(board);
-        printWinner(winner, &PLAYER, &COMPUTER);
+
+        printBoard(board); // show the final board state
+        printWinner(winner, &PLAYER, &COMPUTER);// winner, loser or tie
+
+        // update the scores
         if (winner == PLAYER) {
             playerScore++;
         }
