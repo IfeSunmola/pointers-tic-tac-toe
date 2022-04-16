@@ -1,5 +1,5 @@
 Starting code was gotten from the YouTube channel BroCode:
-https://youtu.be/_889aB2D1KI?list=PLZPZq0r_RZOOzY_vR4zJM32SqsSInGMwe
+https://youtu.be/_889aB2D1KI
 
 Major Changes:
 <ul>
