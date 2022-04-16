@@ -27,21 +27,13 @@ The entire matrix can be traversed using one for loop and the memory address
 
 // prototypes
 void printBoard(char (* board)[BOARD_SIZE]);
-
 void resetBoard(char (* board)[BOARD_SIZE]);
-
 int checkFreeSpaces(char (* board)[BOARD_SIZE]);
-
 void playerMove(char (* board)[BOARD_SIZE], const char* PLAYER);
-
 void computerMove(char (* board)[BOARD_SIZE], const char* computer);
-
 char checkWinner(char (* board)[BOARD_SIZE]);
-
 void printWinner(char winner, const char* PLAYER, const char* COMPUTER);
-
 bool winnerOrTie(char (* board)[BOARD_SIZE], char* winner);
-
 void requestPlayAgain(char* playAgain);
 
 int main() {
@@ -64,16 +56,17 @@ int main() {
         // while there's no winner and there are still spaces on the board, keep playing
         while (winner == ' ' && checkFreeSpaces(board) != 0) {
             printBoard(board);
-            playerMove(board, &PLAYER);
+
+            playerMove(board, &PLAYER); //player makes a move
             winner = checkWinner(board); // check if the player has won
-            // if there is a winner OR there's no space left on the board,
-            // break out of the current loop and print the result
+            // if the PLAYER has not won OR there's no space left on the board, break out of the current loop and print the result
             if (winnerOrTie(board, &winner)) {// if there is a winner or there's a tie (board is full)
                 break;
             }
 
-            computerMove(board, &COMPUTER);
-            winner = checkWinner(board);
+            computerMove(board, &COMPUTER);// computer makes a move
+            winner = checkWinner(board);// check if the computer has won
+            // if the COMPUTER has not won OR there's no space left on the board, break out of the current loop and print the result
             if (winnerOrTie(board, &winner)) {
                 break;
             }
@@ -89,7 +82,7 @@ int main() {
         }
 
         //ask the user if they want to play another round
-        requestPlayAgain(&playAgain);
+        requestPlayAgain(&playAgain); // playAgain char variable is updated here
     }
     //print out some basic game stats
     printf("Thanks for playing!");
@@ -276,7 +269,7 @@ void requestPlayAgain(char* playAgain) {
         if (*playAgain == 'Y' || *playAgain == 'N') {
             validInput = true;
         }
-        else{
+        else {
             printf("Enter either Y or N (not case sensitive)");
         }
     }
