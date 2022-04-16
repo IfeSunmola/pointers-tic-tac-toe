@@ -40,28 +40,21 @@ char checkWinner(char (* board)[BOARD_SIZE]);
 
 void printWinner(char winner, const char* PLAYER, const char* COMPUTER);
 
-/*
- * This method returns true if there is a winner of if the board is full and false if not
- *
- * parameters: char board [][]
- *             pointer to the winner char
- * */
-bool winnerOrTie(char (* board)[BOARD_SIZE], char* winner) {
-    return (*winner != ' ' || checkFreeSpaces(board) == 0);
-}
+bool winnerOrTie(char (* board)[BOARD_SIZE], char* winner);
+
+void requestPlayAgain(char* playAgain);
 
 int main() {
     const char PLAYER = 'X';
     const char COMPUTER = 'O';
     char winner;
-    char response = 'Y';// start the game. Not assigning this could break the game
+    char playAgain = 'Y';// start the game. Not assigning this could break the game
     int playerScore = 0, computerScore = 0, roundCount = 0;
 
     char board[BOARD_SIZE][BOARD_SIZE];
     resetBoard(board);
-    while (response != 'N') {
+    while (playAgain != 'N') {
         winner = ' ';
-        response = ' ';
         resetBoard(board);
         roundCount++;
         system("cls"); // clear the screen before each round begins
@@ -85,7 +78,7 @@ int main() {
                 break;
             }
         }
-        getchar(); // clear the buffer so the "play again" response could be read properly
+        fflush(stdin); // flush the buffer so the playAgain response could be read properly
         printBoard(board);
         printWinner(winner, &PLAYER, &COMPUTER);
         if (winner == PLAYER) {
@@ -94,9 +87,9 @@ int main() {
         else if (winner == COMPUTER) {
             computerScore++;
         }
-        printf("\nWould you like to play again? (Y/N): ");
-        scanf("%c", &response);
-        response = toupper(response);
+
+        //ask the user if they want to play another round
+        requestPlayAgain(&playAgain);
     }
     //print out some basic game stats
     printf("Thanks for playing!");
@@ -263,4 +256,28 @@ char checkWinner(char (* board)[BOARD_SIZE]) {
     return ' ';
 }
 
+/*
+ * This method returns true if there is a winner of if the board is full and false if not
+ *
+ * parameters: char board [][]
+ *             pointer to the winner char
+ * */
+bool winnerOrTie(char (* board)[BOARD_SIZE], char* winner) {
+    return (*winner != ' ' || checkFreeSpaces(board) == 0);
+}
 
+void requestPlayAgain(char* playAgain) {
+    bool validInput = false;
+    while (!validInput) {
+        printf("\nWould you like to play again? (Y/N): ");
+        scanf(" %c", playAgain);
+        fflush(stdin);
+        *playAgain = toupper(*playAgain);
+        if (*playAgain == 'Y' || *playAgain == 'N') {
+            validInput = true;
+        }
+        else{
+            printf("Enter either Y or N (not case sensitive)");
+        }
+    }
+}
